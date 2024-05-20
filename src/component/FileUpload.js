@@ -12,7 +12,7 @@ const FileUpload = () => {
     const formData = new FormData();
     formData.append('file', file);
 
-    axios.post('http://localhost:8080/cashflow', formData)
+    axios.post('http://gplank-test-eb-backend.ap-south-1.elasticbeanstalk.com/cashflow', formData)
     .then(response => {
       console.log('File uploaded successfully:', response.data);
       alert('File uploaded successfully');
