@@ -44,7 +44,7 @@ const App = () => {
 
     try {
       const response = await axios.post(
-        "http://gplank-test-eb-backend.ap-south-1.elasticbeanstalk.com/subsecinfo",
+        "http://gplank-test-eb-frontend.ap-south-1.elasticbeanstalk.com/subsecinfo",
         formData,
         {
           headers: {
