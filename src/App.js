@@ -16,35 +16,30 @@ import { useState } from "react";
 import axios from "axios";
 
 const App = () => {
-  const [file1, setFile1] = useState(null);
-  const [file2, setFile2] = useState(null);
-  // const [file3, setFile3] = useState(null);
+  const [files, setFiles] = useState([]); // Array to hold both files
+  const [settlementDate, setSettlementDate] = useState(null);
   const [data, setData] = useState(null);
-  const [settlementDate, setsettlementDate] = useState(null);
   const [error, setError] = useState("");
 
-  // const [columns, setcolumns] = useState([]);
-  // const [columns1, setcolumns1] = useState([]);
-
-  const handleFile1Change = (e) => {
-    setFile1(e.target.files[0]);
+  const handleFileChange = (event) => {
+    setFiles([...files, event.target.files[0]]); // Add selected file to array
   };
 
-  const handleFile2Change = (e) => {
-    setFile2(e.target.files[0]);
-  };
+  const handleSubmit = async (event) => {
+    event.preventDefault();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+    if (!files.length) {
+      setError("Please select at least one file.");
+      return;
+    }
 
     const formData = new FormData();
-    formData.append("file1", file1);
-    formData.append("file2", file2);
     formData.append("settlement_date", settlementDate);
+    files.forEach((file) => formData.append("files", file)); // Add multiple files
 
     try {
       const response = await axios.post(
-        "http://gplank-test-eb-frontend.ap-south-1.elasticbeanstalk.com/subsecinfo",
+        `http://gplank-test-eb-backend.ap-south-1.elasticbeanstalk.com:8080/subsecinfo`,
         formData,
         {
           headers: {
@@ -70,16 +65,15 @@ const App = () => {
 
   return (
     <div>
-      <h2>Upload Excel File</h2>
+      <h2>Upload Excel Files</h2>
       <form onSubmit={handleSubmit}>
         <input
           type="date"
           name=""
           id=""
-          onChange={(e) => setsettlementDate(e.target.value)}
+          onChange={(e) => setSettlementDate(e.target.value)}
         />
-        <input type="file" onChange={handleFile1Change} accept=".xlsx, .xls" />
-        <input type="file" onChange={handleFile2Change} accept=".xlsx, .xls" />
+        <input type="file" onChange={handleFileChange} accept=".xlsx, .xls" multiple />
         <button type="submit">Upload</button>
       </form>
       {error && <p style={{ color: "red" }}>{error}</p>}
@@ -88,6 +82,88 @@ const App = () => {
 };
 
 export default App;
+
+
+
+
+
+
+// import { useState } from "react";
+// import axios from "axios";
+
+// const App = () => {
+//   const [file1, setFile1] = useState(null);
+//   const [file2, setFile2] = useState(null);
+//   // const [file3, setFile3] = useState(null);
+//   const [data, setData] = useState(null);
+//   const [settlementDate, setsettlementDate] = useState(null);
+//   const [error, setError] = useState("");
+
+//   // const [columns, setcolumns] = useState([]);
+//   // const [columns1, setcolumns1] = useState([]);
+
+//   const handleFile1Change = (e) => {
+//     setFile1(e.target.files[0]);
+//   };
+
+//   const handleFile2Change = (e) => {
+//     setFile2(e.target.files[0]);
+//   };
+
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+
+//     const formData = new FormData();
+//     formData.append("file1", file1);
+//     formData.append("file2", file2);
+//     formData.append("settlement_date", settlementDate);
+
+//     try {
+//       const response = await axios.post(
+//         "http://gplank-test-eb-frontend.ap-south-1.elasticbeanstalk.com/subsecinfo",
+//         formData,
+//         {
+//           headers: {
+//             "Content-Type": "multipart/form-data",
+//           },
+//           responseType: "blob",
+//         }
+//       );
+
+//       const url = window.URL.createObjectURL(new Blob([response.data]));
+//       const link = document.createElement("a");
+//       link.href = url;
+//       link.setAttribute("download", "output.xlsx");
+//       document.body.appendChild(link);
+//       link.click();
+
+//       setData(response.data);
+//       setError("");
+//     } catch (err) {
+//       setError("Failed to upload file.");
+//     }
+//   };
+
+//   return (
+//     <div>
+//       <h2>Upload Excel File</h2>
+//       <form onSubmit={handleSubmit}>
+//         <input
+//           type="date"
+//           name=""
+//           id=""
+//           onChange={(e) => setsettlementDate(e.target.value)}
+//         />
+//         <input type="file" onChange={handleFile1Change} accept=".xlsx, .xls" />
+//         <input type="file" onChange={handleFile2Change} accept=".xlsx, .xls" />
+//         <button type="submit">Upload</button>
+//       </form>
+//       {error && <p style={{ color: "red" }}>{error}</p>}
+//     </div>
+//   );
+// };
+
+// export default App;
 
 
 
