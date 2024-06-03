@@ -4,11 +4,11 @@ import axios from "axios";
 const App = () => {
   const [file1, setFile1] = useState(null);
   const [file2, setFile2] = useState(null);
-  const [data, setData] = useState(null);
+  // const [data, setData] = useState(null);
   const [settlementDate, setsettlementDate] = useState(null);
   const [from, setfrom] = useState(null);
   const [to, setto] = useState(null);
-  const [error, seterror] = useState("");
+  // const [error, seterror] = useState("");
 
   const handleFile1Change = (e) => {
     setFile1(e.target.files[0]);
@@ -27,11 +27,9 @@ const App = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/download",
+        "http://gplank-test-eb-backend.ap-south-1.elasticbeanstalk.com/download",
         { from, to },
-        {
-          responseType: "blob",
-        }
+        {responseType: "blob",}
       );
 
       const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -63,7 +61,7 @@ const App = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/subsecinfo",
+        "http://gplank-test-eb-backend.ap-south-1.elasticbeanstalk.com/subsecinfo",
         formData,
         {
           headers: {
@@ -101,7 +99,7 @@ const App = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/upload",
+        "http://gplank-test-eb-backend.ap-south-1.elasticbeanstalk.com/upload",
         formData,
         {
           headers: {
@@ -167,11 +165,6 @@ const App = () => {
             Upload
           </button>
         </div>
-        {error && (
-          <p className="text-center" style={{ color: "red" }}>
-            {error}
-          </p>
-        )}
       </div>
 
       <div className="w-1/2 flex flex-col justify-around items-center gap-8 bg-slate-900 p-8 rounded-lg">
@@ -229,53 +222,6 @@ const App = () => {
           Dowmload
         </button>
       </div>
-      {/* {data && (
-        <div>
-          <h3>File Data:</h3>
-          <pre>{JSON.stringify(data.calculatedData, null, 2)}</pre>
-          <table>
-            <thead>
-              <tr>
-                {columns.map((col, i) => (
-                  <th style={{ padding: "1rem" }} key={i}>
-                    {col}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {data.result.map((row, i) => (
-                <tr key={i}>
-                  {columns.map((col, i) => (
-                    <td key={i}>{row[col]}</td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <table>
-            <thead>
-              <tr>
-                {columns1.map((col, i) => (
-                  <th style={{ padding: "1rem" }} key={i}>
-                    {col}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {data.Redemption_Schedule.map((row, i) => (
-                <tr key={i}>
-                  {columns1.map((col, i) => (
-                    <td key={i}>{row[col]}</td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <pre>{JSON.stringify(data, null, 2)}</pre>
-        </div>
-      )} */}
     </div>
   );
 };
