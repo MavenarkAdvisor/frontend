@@ -4,11 +4,11 @@ import axios from "axios";
 const App = () => {
   const [file1, setFile1] = useState(null);
   const [file2, setFile2] = useState(null);
-  const [data, setData] = useState(null);
+  // const [data, setData] = useState(null);
   const [settlementDate, setsettlementDate] = useState(null);
   const [from, setfrom] = useState(null);
   const [to, setto] = useState(null);
-  const [error, seterror] = useState("");
+  // const [error, seterror] = useState("");
 
   const downloadCSV = (data) => {
     const csvRows = [];
@@ -189,11 +189,11 @@ const App = () => {
             Upload
           </button>
         </div>
-        {error && (
+       {/* {error && (
           <p className="text-center" style={{ color: "red" }}>
             {error}
           </p>
-        )}
+        )} */}
       </div>
 
       <div className="w-1/2 flex flex-col justify-around items-center gap-8 bg-slate-900 p-8 rounded-lg">
