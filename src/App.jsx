@@ -4,11 +4,43 @@ import axios from "axios";
 const App = () => {
   const [file1, setFile1] = useState(null);
   const [file2, setFile2] = useState(null);
-  // const [data, setData] = useState(null);
+  const [data, setData] = useState(null);
   const [settlementDate, setsettlementDate] = useState(null);
   const [from, setfrom] = useState(null);
   const [to, setto] = useState(null);
-  // const [error, seterror] = useState("");
+  const [error, seterror] = useState("");
+
+  const downloadCSV = (data) => {
+    const csvRows = [];
+
+    const headers = Object.keys(data[0]);
+
+    csvRows.push(headers.join(","));
+
+    data.forEach((row) => {
+      const values = headers.map((header) => {
+        const fieldValue = row[header];
+
+        if (fieldValue && String(fieldValue).includes(",")) {
+          return `"${fieldValue}"`;
+        } else {
+          return fieldValue;
+        }
+      });
+      csvRows.push(values.join(","));
+    });
+
+    const csvData = csvRows.join("\n");
+
+    const blob = new Blob([csvData], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "data.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   const handleFile1Change = (e) => {
     setFile1(e.target.files[0]);
@@ -26,24 +58,19 @@ const App = () => {
     }
 
     try {
-      const response = await axios.post(
-        "http://gplank-test-eb-backend.ap-south-1.elasticbeanstalk.com/download",
-        { from, to },
-        {
-          responseType: "blob",
-        }
-      );
+      const { data } = await axios.post("http://localhost:8080/download", {
+        from,
+        to,
+      });
 
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", "output.xlsx");
-      document.body.appendChild(link);
-      link.click();
+      if (data.status) {
+        downloadCSV(data.data);
 
-      alert("Result file download successfully");
+        alert("Result file download successfully");
+      }
     } catch (err) {
-      alert("No Data fetched in date range");
+      console.log(err);
+      alert("Something went wrong");
     }
   };
 
@@ -62,29 +89,24 @@ const App = () => {
     formData.append("settlement_date", settlementDate);
 
     try {
-      const response = await axios.post(
-        "http://gplank-test-eb-backend.ap-south-1.elasticbeanstalk.com/subsecinfo",
+      const { data } = await axios.post(
+        "http://localhost:8080/subsecinfo",
         formData,
         {
           headers: {
             "Content-Type": "multipart/form-data",
           },
-          responseType: "blob",
         }
       );
 
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", "output.xlsx");
-      document.body.appendChild(link);
-      link.click();
+      if (data.status) {
+        downloadCSV(data.data);
 
-      // setData(response.data);
-
-      alert("Result file download successfully");
+        alert("Result file download successfully");
+      }
     } catch (err) {
-      alert("Failed to upload file.");
+      console.log(err);
+      alert("Some bad happened");
     }
   };
 
@@ -101,7 +123,7 @@ const App = () => {
 
     try {
       const response = await axios.post(
-        "http://gplank-test-eb-backend.ap-south-1.elasticbeanstalk.com/upload",
+        "http://localhost:8080/upload",
         formData,
         {
           headers: {
@@ -167,6 +189,11 @@ const App = () => {
             Upload
           </button>
         </div>
+        {error && (
+          <p className="text-center" style={{ color: "red" }}>
+            {error}
+          </p>
+        )}
       </div>
 
       <div className="w-1/2 flex flex-col justify-around items-center gap-8 bg-slate-900 p-8 rounded-lg">
@@ -224,6 +251,53 @@ const App = () => {
           Dowmload
         </button>
       </div>
+      {/* {data && (
+        <div>
+          <h3>File Data:</h3>
+          <pre>{JSON.stringify(data.calculatedData, null, 2)}</pre>
+          <table>
+            <thead>
+              <tr>
+                {columns.map((col, i) => (
+                  <th style={{ padding: "1rem" }} key={i}>
+                    {col}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {data.result.map((row, i) => (
+                <tr key={i}>
+                  {columns.map((col, i) => (
+                    <td key={i}>{row[col]}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <table>
+            <thead>
+              <tr>
+                {columns1.map((col, i) => (
+                  <th style={{ padding: "1rem" }} key={i}>
+                    {col}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {data.Redemption_Schedule.map((row, i) => (
+                <tr key={i}>
+                  {columns1.map((col, i) => (
+                    <td key={i}>{row[col]}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <pre>{JSON.stringify(data, null, 2)}</pre>
+        </div>
+      )} */}
     </div>
   );
 };
