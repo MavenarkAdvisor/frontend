@@ -166,10 +166,10 @@ const App = () => {
       </div>
 
       <div className="w-1/2 flex flex-col justify-around items-center gap-8 bg-slate-900 p-8 rounded-lg">
-        <div className="text-xl ">Submit Data for Calculation</div>
+        <div className="text-xl ">Submit Settlement Date for Calculation</div>
         <div className="flex items-center justify-around w-full">
           <div className="flex flex-col gap-2 items-center">
-            <label htmlFor="settlementdate">Settlement Date</label>
+            {/* <label htmlFor="settlementdate">Settlement Date</label> */}
             <input
               type="date"
               name=""
