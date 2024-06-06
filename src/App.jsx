@@ -1,45 +1,19 @@
 import { useState } from "react";
 import axios from "axios";
+import * as XLSX from "xlsx";
 
 const App = () => {
   const [file1, setFile1] = useState(null);
   const [file2, setFile2] = useState(null);
-  // const [data, setData] = useState(null);
-  const [settlementDate, setsettlementDate] = useState(null);
-  const [from, setfrom] = useState(null);
-  const [to, setto] = useState(null);
-  // const [error, seterror] = useState("");
+  const [settlementDate, setSettlementDate] = useState(null);
+  const [from, setFrom] = useState(null);
+  const [to, setTo] = useState(null);
 
-  const downloadCSV = (data) => {
-    const csvRows = [];
-
-    const headers = Object.keys(data[0]);
-
-    csvRows.push(headers.join(","));
-
-    data.forEach((row) => {
-      const values = headers.map((header) => {
-        const fieldValue = row[header];
-
-        if (fieldValue && String(fieldValue).includes(",")) {
-          return `"${fieldValue}"`;
-        } else {
-          return fieldValue;
-        }
-      });
-      csvRows.push(values.join(","));
-    });
-
-    const csvData = csvRows.join("\n");
-
-    const blob = new Blob([csvData], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", "data.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const downloadXLSX = (data) => {
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
+    XLSX.writeFile(workbook, "PriceMaster.xlsx");
   };
 
   const handleFile1Change = (e) => {
@@ -64,9 +38,9 @@ const App = () => {
       });
 
       if (data.status) {
-        downloadCSV(data.data);
+        downloadXLSX(data.data);
 
-        alert("Result file download successfully");
+        // alert("Result file downloaded successfully");
       }
     } catch (err) {
       console.log(err);
@@ -100,13 +74,13 @@ const App = () => {
       );
 
       if (data.status) {
-        downloadCSV(data.data);
+        downloadXLSX(data.data);
 
-        alert("Result file download successfully");
+        alert("Result file downloaded successfully");
       }
     } catch (err) {
       console.log(err);
-      alert("Some bad happened");
+      alert("Something bad happened");
     }
   };
 
@@ -131,8 +105,8 @@ const App = () => {
           },
         }
       );
-      if (response.status) {
-        alert("Files Upload Successfully");
+      if (response.data.status) {
+        alert("Files uploaded successfully");
       }
     } catch (err) {
       alert("Failed to upload file.");
@@ -159,7 +133,7 @@ const App = () => {
               htmlFor="file1"
               className="bg-slate-100 text-black p-2 font-bold rounded-md"
             >
-              Upload File 1
+              Upload Cashflow File
             </label>
           </div>
           <div className="flex flex-col gap-4 items-center">
@@ -177,7 +151,7 @@ const App = () => {
               className="bg-slate-100 text-black p-2 font-bold rounded-md"
               htmlFor="file2"
             >
-              Upload File 2
+              Upload Security Details File
             </label>
           </div>
         </div>
@@ -189,11 +163,6 @@ const App = () => {
             Upload
           </button>
         </div>
-       {/* {error && (
-          <p className="text-center" style={{ color: "red" }}>
-            {error}
-          </p>
-        )} */}
       </div>
 
       <div className="w-1/2 flex flex-col justify-around items-center gap-8 bg-slate-900 p-8 rounded-lg">
@@ -206,7 +175,7 @@ const App = () => {
               name=""
               id="settlementdate"
               className="p-2 px-4 border-white border-2 rounded-md"
-              onChange={(e) => setsettlementDate(e.target.value)}
+              onChange={(e) => setSettlementDate(e.target.value)}
             />
           </div>
           <button
@@ -229,7 +198,7 @@ const App = () => {
               name=""
               id="from"
               className="p-2 px-4 border-white border-2 rounded-md"
-              onChange={(e) => setfrom(e.target.value)}
+              onChange={(e) => setFrom(e.target.value)}
             />
           </div>
           <div className="flex flex-col gap-2 items-center">
@@ -239,65 +208,17 @@ const App = () => {
               name=""
               id="to"
               className="p-2 px-4 border-white border-2 rounded-md"
-              onChange={(e) => setto(e.target.value)}
+              onChange={(e) => setTo(e.target.value)}
             />
           </div>
         </div>
-
         <button
           className="h-fit bg-orange-400 p-2 px-6 text-black font-bold rounded-md"
           onClick={handleDownload}
         >
-          Dowmload
+          Download
         </button>
       </div>
-      {/* {data && (
-        <div>
-          <h3>File Data:</h3>
-          <pre>{JSON.stringify(data.calculatedData, null, 2)}</pre>
-          <table>
-            <thead>
-              <tr>
-                {columns.map((col, i) => (
-                  <th style={{ padding: "1rem" }} key={i}>
-                    {col}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {data.result.map((row, i) => (
-                <tr key={i}>
-                  {columns.map((col, i) => (
-                    <td key={i}>{row[col]}</td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <table>
-            <thead>
-              <tr>
-                {columns1.map((col, i) => (
-                  <th style={{ padding: "1rem" }} key={i}>
-                    {col}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {data.Redemption_Schedule.map((row, i) => (
-                <tr key={i}>
-                  {columns1.map((col, i) => (
-                    <td key={i}>{row[col]}</td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <pre>{JSON.stringify(data, null, 2)}</pre>
-        </div>
-      )} */}
     </div>
   );
 };
