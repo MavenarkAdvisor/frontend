@@ -123,6 +123,7 @@ const App = () => {
 
   return (
     <div className="flex flex-col justify-center items-center w-full h-screen p-4 gap-4 bg-slate-100">
+      {/* Upload cashflow security details and stock master */}
       <h2 className="text-2xl text-black font-bold">Upload Excel File</h2>
       <div className="flex gap-6 w-full">
         <div className="w-1/2 flex flex-col gap-4 bg-slate-900 p-4 rounded-lg justify-around items-center">
@@ -201,6 +202,7 @@ const App = () => {
           </div>
         </div>
       </div>
+      {/* System Date and Data download using date range*/}
       <div className="flex flex-row gap-6 w-full">
         <div className="w-1/2 flex flex-col justify-around items-center gap-4 bg-slate-900 p-4 rounded-lg">
           <div className="text-xl ">Submit System Date for Calculation</div>
