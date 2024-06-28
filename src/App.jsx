@@ -37,7 +37,7 @@ const App = () => {
     }
 
     try {
-      const { data } = await axios.post("http://localhost:8080/download", {
+      const { data } = await axios.post("http://gplank-test-eb-backend.ap-south-1.elasticbeanstalk.com/download", {
         from,
         to,
       });
@@ -72,7 +72,7 @@ const App = () => {
 
     try {
       const { data } = await axios.post(
-        "http://localhost:8080/subsecinfo",
+        "http://gplank-test-eb-backend.ap-south-1.elasticbeanstalk.com/subsecinfo",
         formData,
         {
           headers: {
@@ -105,7 +105,7 @@ const App = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/upload",
+        "http://gplank-test-eb-backend.ap-south-1.elasticbeanstalk.com/upload",
         formData,
         {
           headers: {
