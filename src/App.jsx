@@ -6,6 +6,9 @@ const App = () => {
   const [file1, setFile1] = useState(null);
   const [file2, setFile2] = useState(null);
   const [file3, setFile3] = useState(null);
+
+  const [marketprice, setmarketprice] = useState(null);
+
   const [systemDate, setSystemDate] = useState(null);
   const [from, setFrom] = useState(null);
   const [to, setTo] = useState(null);
@@ -29,6 +32,10 @@ const App = () => {
     setFile3(e.target.files[0]);
   };
 
+  const handlemarketpriceChange = (e) => {
+    setmarketprice(e.target.files[0]);
+  };
+
   const handleDownload = async () => {
     if (!from) {
       return alert("Please select from date");
@@ -37,10 +44,13 @@ const App = () => {
     }
 
     try {
-      const { data } = await axios.post("http://localhost:8080/download", {
-        from,
-        to,
-      });
+      const { data } = await axios.post(
+        "http://gplank-test-eb-backend.ap-south-1.elasticbeanstalk.com/download",
+        {
+          from,
+          to,
+        }
+      );
 
       if (data.status) {
         downloadXLSX(data.data);
@@ -60,9 +70,12 @@ const App = () => {
 
     try {
       console.log(systemDate);
-      const { data } = await axios.post("http://localhost:8080/subsecinfo", {
-        system_date: systemDate,
-      });
+      const { data } = await axios.post(
+        "http://gplank-test-eb-backend.ap-south-1.elasticbeanstalk.com/subsecinfo",
+        {
+          system_date: systemDate,
+        }
+      );
 
       if (data.status) {
         if (file === "stockmaster") {
@@ -85,9 +98,12 @@ const App = () => {
     }
 
     try {
-      const { data } = await axios.post("http://localhost:8080/subposition", {
-        system_date: systemDate,
-      });
+      const { data } = await axios.post(
+        "http://gplank-test-eb-backend.ap-south-1.elasticbeanstalk.com/subposition",
+        {
+          system_date: systemDate,
+        }
+      );
 
       if (data.status) {
         downloadXLSX(data.subposition, "SubPosition.xlsx");
@@ -97,6 +113,58 @@ const App = () => {
     } catch (err) {
       console.log(err);
       alert("Something bad happened");
+    }
+  };
+
+  const handlePosition = async () => {
+    try {
+      if (!systemDate) {
+        return alert("Please select settlement date");
+      }
+
+      const { data } = await axios.post(
+        "http://gplank-test-eb-backend.ap-south-1.elasticbeanstalk.com/position",
+        {
+          system_date: systemDate,
+        }
+      );
+
+      if (data.status) {
+        downloadXLSX(data.position, "Position.xlsx");
+
+        alert("Result file downloaded successfully");
+      }
+    } catch (err) {
+      console.log(err);
+      alert("Something bad happened");
+    }
+  };
+
+  const handleMarketPrice = async () => {
+    if (!marketprice) {
+      return alert("Please Upload MarketPrice file");
+    }
+
+    const formData = new FormData();
+    formData.append("file", marketprice);
+
+    try {
+      const { data } = await axios.post(
+        "http://gplank-test-eb-backend.ap-south-1.elasticbeanstalk.com/marketprice",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      if (data.status) {
+        downloadXLSX(data.marketprices, "MarketPrices.xlsx");
+        // alert("Cashflow file uploaded successfully");
+      }
+    } catch (err) {
+      console.log(err);
+      alert("Failed to upload file.");
     }
   };
 
@@ -110,7 +178,7 @@ const App = () => {
 
     try {
       const { data } = await axios.post(
-        "http://localhost:8080/cashflowupload",
+        "http://gplank-test-eb-backend.ap-south-1.elasticbeanstalk.com/cashflowupload",
         formData,
         {
           headers: {
@@ -135,7 +203,7 @@ const App = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/securityupload",
+        "http://gplank-test-eb-backend.ap-south-1.elasticbeanstalk.com/securityupload",
         formData,
         {
           headers: {
@@ -161,7 +229,7 @@ const App = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/stockmasterupload",
+        "http://gplank-test-eb-backend.ap-south-1.elasticbeanstalk.com/stockmasterupload",
         formData,
         {
           headers: {
@@ -306,6 +374,49 @@ const App = () => {
               onClick={handleSubPosition}
             >
               Download SubPosition
+            </button>
+          </div>
+        </div>
+        <div className=" flex flex-col justify-around items-center gap-4 bg-slate-900 p-6 rounded-lg">
+          <div className="text-xl ">Position Calculation</div>
+          <div className="flex items-center justify-around gap-4 w-full">
+            <button
+              className="h-fit bg-orange-400 p-2 px-6 text-black font-bold rounded-md"
+              onClick={handlePosition}
+            >
+              Download Position
+            </button>
+          </div>
+        </div>
+      </div>
+      <div className="flex items-center justify-center gap-6 w-full">
+        <div className=" flex flex-col justify-around items-center gap-4 bg-slate-900 p-6 rounded-lg">
+          <div className="text-xl ">MarketPrices Calculation</div>
+
+          <div className="flex items-center justify-around gap-6 w-full">
+            <div className="flex flex-col gap-4 items-center">
+              <input
+                type="file"
+                className="hidden"
+                id="marketprice"
+                onChange={handlemarketpriceChange}
+                accept=".xlsx, .xls"
+              />
+              <div>
+                {marketprice?.name ? marketprice.name : "No File Selected"}
+              </div>
+              <label
+                htmlFor="marketprice"
+                className="bg-slate-100 text-black p-2 font-bold rounded-md"
+              >
+                Upload MarketPrice File
+              </label>
+            </div>
+            <button
+              className="h-fit bg-orange-400 p-2 px-6 text-black font-bold rounded-md"
+              onClick={handleMarketPrice}
+            >
+              Download MarketPrices
             </button>
           </div>
         </div>
